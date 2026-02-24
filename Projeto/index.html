@@ -1,57 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<meta charset="UTF-8">
+<title>Gestão de Clientes</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="tela-inicial">
-        <div id="formulario-login">
-            <form action="login" method="post">
-                <label for="nome">Nome do usuário:</label>
-                <input type="text" id="nome" name="nome" required><br><br>
-                
-                <button id="botao-logar" type="submit" value="Entrar">
-            </form>
-        </div>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-screen">
+    <div class="login-box">
+        <h2>Login do Operador</h2>
+        <input type="text" id="operadorInput" placeholder="Nome do operador">
+        <button id="loginBtn">Entrar</button>
     </div>
-    <div id="area-logada">
-        <div id="info-operador">
-            <h1>Nome do operador: <b id="nome-operador"></b></h1>
-            <button id="logoff">Sair</button>
-        </div>
-        <div id="formulario-cadastro">
-            <form action="cadastro">
-                <label for="nome-cliente">Nome do Cliente</label>
-                <input type="text" name="nome-cliente" id="nome-cliente">
+</div>
 
-                <label for="email-cliente">E-mail</label>
-                <input type="email" name="email-cliente" id="email-cliente">
+<!-- APP -->
+<div id="app" class="hidden">
 
-                <label for="plano-cliente">Plano do cliente:</label>
-                <select id="plano-cliente">
-                    <option value="" selected disabled>Selecione um plano</option>
-                    <option value="gold">Gold</option>
-                    <option value="silver">Silver</option>
-                    <option value="bronze">Bronze</option>
-                </select>
-
-                <button id="botao-cadastrar-cliente" type="submit">Cadastrar</button>
-            </form>
-        </div>
-        <div id="filtro-de-busca">
-            <input type="text" id="filtra-cliente" placeholder="Digite um nome para filtrar">
-        </div>
-        <div id="lista-clientes">
-            <ul id="ul-clientes">
-                <li>
-                    <h2>Nome</h2>
-                    <h3>Email</h3>
-                    <h3>    </h3>
-                </li>
-            </ul>
-        </div>
+<header>
+    <h1>Gestão de Clientes</h1>
+    <div class="top-bar">
+        <span id="operadorInfo"></span>
+        <button id="logoutBtn">Sair</button>
     </div>
+</header>
+
+<section class="form-section">
+    <h2>Cadastre o cliente:</h2>
+    <form id="clienteForm">
+
+        <input type="text" id="nome" placeholder="Nome" required>
+        <input type="email" id="email" placeholder="E-mail" required>
+        <input type="text" id="cep" placeholder="CEP" required>
+        <input type="text" id="rua" placeholder="Rua" readonly>
+        <input type="text" id="bairro" placeholder="Bairro" readonly>
+        <input type="text" id="cidade" placeholder="Cidade" readonly>
+        <input type="text" id="estado" placeholder="Estado" readonly>
+
+        <select id="plano" required>
+            <option value="">Plano</option>
+            <option value="Gold">Gold</option>
+            <option value="Silver">Silver</option>
+            <option value="Bronze">Bronze</option>
+        </select>
+
+        <button type="submit">Salvar</button>
+    </form>
+</section>
+
+<section class="form-section">
+    <h2>Localize seu cliente:</h2>
+    <input type="text" id="busca" placeholder="Buscar cliente...">
+</section>
+
+<section>
+    <div id="clientesContainer"></div>
+</section>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>

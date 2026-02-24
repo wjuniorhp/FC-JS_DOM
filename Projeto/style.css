@@ -1,0 +1,110 @@
+body {
+    font-family: Arial;
+    background: #f4f4f4;
+    margin: 0;
+}
+
+.hidden {
+    display: none;
+}
+
+header {
+    background: #222;
+    color: white;
+    padding: 15px;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+button {
+    padding: 8px 12px;
+    cursor: pointer;
+    background-color: #222;
+    color: #f4f4f4;
+    border-radius: 5px;
+}
+
+.form-section {
+    padding: 20px;
+}
+
+input, select {
+    padding: 8px;
+    margin: 5px;
+}
+
+#clientesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 20px;
+}
+
+/* CARD */
+.card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    width: 220px;
+    text-align: center;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeIn 0.4s forwards;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.card.removing {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.gold { border-left: 10px solid gold; }
+.silver { border-left: 10px solid silver; }
+.bronze { border-left: 10px solid #cd7f32; }
+
+.erro {
+    border: 2px solid red !important;
+}
+
+.login-screen {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+}
+
+.login-box {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+}
+
+.avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.erro {
+    border: 2px solid red !important;
+}
+
+.mensagem {
+    margin-top: 10px;
+    font-size: 14px;
+    color: red;
+}

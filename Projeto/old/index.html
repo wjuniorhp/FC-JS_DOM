@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="tela-inicial">
+        <div id="formulario-login">
+            <form action="login" method="post">
+                <label for="nome">Nome do usuário:</label>
+                <input type="text" id="nome" name="nome" required><br><br>
+                
+                <button id="botao-logar" type="submit" value="Entrar">
+            </form>
+        </div>
+    </div>
+    <div id="area-logada">
+        <div id="info-operador">
+            <h1>Nome do operador: <b id="nome-operador"></b></h1>
+            <button id="logoff">Sair</button>
+        </div>
+        <div id="formulario-cadastro">
+            <form action="cadastro">
+                <label for="nome-cliente">Nome do Cliente</label>
+                <input type="text" name="nome-cliente" id="nome-cliente">
+
+                <label for="email-cliente">E-mail</label>
+                <input type="email" name="email-cliente" id="email-cliente">
+
+                <label for="plano-cliente">Plano do cliente:</label>
+                <select id="plano-cliente">
+                    <option value="" selected disabled>Selecione um plano</option>
+                    <option value="gold">Gold</option>
+                    <option value="silver">Silver</option>
+                    <option value="bronze">Bronze</option>
+                </select>
+
+                <button id="botao-cadastrar-cliente" type="submit">Cadastrar</button>
+            </form>
+        </div>
+        <div id="filtro-de-busca">
+            <input type="text" id="filtra-cliente" placeholder="Digite um nome para filtrar">
+        </div>
+        <div id="lista-clientes">
+            <ul id="ul-clientes">
+                <li>
+                    <h2>Nome</h2>
+                    <h3>Email</h3>
+                    <h3>    </h3>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
