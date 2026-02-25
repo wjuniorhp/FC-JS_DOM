@@ -23,6 +23,7 @@ const estadoInput = document.getElementById("estado");
 let cepValido = false;
 
 let operadorAtual = sessionStorage.getItem("operador");
+const operadoresAdmins = ["admin", "Wellington", "Anderson", "Alexandre"];
 let clientes = [];
 
 /* UUID */
@@ -62,16 +63,17 @@ if (operadorAtual) {
 }
 
 /* LOCAL STORAGE POR OPERADOR */
-function chaveOperador() {
-    return "clientes_" + operadorAtual;
-}
-
 function carregarClientes() {
-    clientes = JSON.parse(localStorage.getItem(chaveOperador())) || [];
+    todosClientes = JSON.parse(localStorage.getItem("clientes_db")) || [];
+    for (let cliente of todosClientes) {
+        if (cliente.operador == operadorAtual || operadoresAdmins.includes(operadorAtual)) {
+            clientes.push(cliente);
+        }
+    }
 }
 
 function salvarClientes() {
-    localStorage.setItem(chaveOperador(), JSON.stringify(clientes));
+    localStorage.setItem("clientes_db", JSON.stringify(clientes));
 }
 /* CRIAR CARD */
 function criarCard(cliente) {
@@ -85,7 +87,7 @@ function criarCard(cliente) {
 
     // Se avatar falhar
     img.onerror = () => {
-        img.src = "https://via.placeholder.com/60";
+        img.src = "./images/placeholder.jpg";
     };
 
     const nome = document.createElement("h3");
@@ -140,7 +142,8 @@ form.addEventListener("submit", (e) => {
         endereco: ruaInput.value,
         cidade: cidadeInput.value,
         estado: estadoInput.value,
-        avatar: gerarAvatar(nomeInput.value)
+        avatar: gerarAvatar(nomeInput.value),
+        operador: operadorAtual
     };
 
     clientes.push(novoCliente);
@@ -182,6 +185,7 @@ cepInput.addEventListener("blur", async () => {
 
     if (cep.length !== 8) {
         mostrarErroCEP("CEP inválido.");
+        cepValido = false;
         return;
     }
 
