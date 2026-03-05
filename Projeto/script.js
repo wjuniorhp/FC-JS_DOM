@@ -1,4 +1,4 @@
-/* VARIAVEIS */
+/* DECLARANDO AS VARIAVEIS QUE SERÃO UTILIZADAS */
 
 const loginScreen = document.getElementById("loginScreen");
 const app = document.getElementById("app");
@@ -19,19 +19,14 @@ const ruaInput = document.getElementById("rua");
 const bairroInput = document.getElementById("bairro");
 const cidadeInput = document.getElementById("cidade");
 const estadoInput = document.getElementById("estado");
-
-let cepValido = false;
-
-let operadorAtual = sessionStorage.getItem("operador");
 const operadoresAdmins = ["admin", "Wellington", "Anderson", "Alexandre"];
+
+let timeLimite01 = 3000;
+let timeLimite02 = 3000;
+let operadorAtual = sessionStorage.getItem("operador");
 let clientes = [];
 
-/* UUID */
-function gerarUUID() {
-    return crypto.randomUUID();
-}
-
-/* LOGIN */
+/* FUNÇÃO DE LOGIN */
 function iniciarSistema(nome) {
     operadorAtual = nome;
     sessionStorage.setItem("operador", nome);
@@ -72,9 +67,20 @@ function carregarClientes() {
     }
 }
 
+/* SALVAR CLIENTE */
 function salvarClientes() {
-    localStorage.setItem("clientes_db", JSON.stringify(clientes));
+    const todosClientes = JSON.parse(localStorage.getItem("clientes_db")) || [];
+
+    // Remove clientes do operador atual
+    const outrosClientes = todosClientes.filter(c => c.operador !== operadorAtual);
+
+    // Junta com os clientes atuais
+    const atualizado = [...outrosClientes, ...clientes];
+
+    localStorage.setItem("clientes_db", JSON.stringify(atualizado));
 }
+
+
 /* CRIAR CARD */
 function criarCard(cliente) {
 
@@ -125,34 +131,86 @@ function renderizarCards(lista = clientes) {
 }
 
 /* ADICIONAR CLIENTE */
-form.addEventListener("submit", (e) => {
+const btnSalvar = document.getElementById("btnSalvar");
+const statusEl = document.getElementById("status");
+
+form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    if (!cepValido) {
-        alert("CEP inválido. Verifique antes de salvar.");
-        return;
+    try {
+
+        if (!nomeInput.value || !emailInput.value || !cepInput.value || !planoSelect.value) {
+            throw new Error("Preencha todos os campos obrigatórios.");
+        }
+
+        btnSalvar.disabled = true;
+        statusEl.style.display = "block";
+        btnSalvar.textContent = "Processando...";
+        btnSalvar.className = "btn_processando";
+        statusEl.className = "status loading";
+        statusEl.textContent = "Consultando CEP...";
+        await esperar(timeLimite01);
+
+        // Buscar CEP
+        const enderecoData = await buscarCEP(cepInput.value);
+
+        ruaInput.value = enderecoData.logradouro;
+        bairroInput.value = enderecoData.bairro;
+        cidadeInput.value = enderecoData.localidade;
+        estadoInput.value = enderecoData.uf;
+
+        // Análise de Crédito
+        statusEl.textContent = "Realizando análise de crédito...";
+        await simularAnaliseCredito(nomeInput.value, planoSelect.value);
+
+        // Gerar Avatar
+        statusEl.textContent = "Gerando avatar...";
+        await esperar(timeLimite01);
+        const avatarUrl = gerarAvatar(nomeInput.value);
+
+        // Criar Cliente
+        const novoCliente = {
+            id: Date.now(),
+            nome: nomeInput.value,
+            email: emailInput.value,
+            plano: planoSelect.value,
+            cep: cepInput.value,
+            endereco: enderecoData.logradouro,
+            cidade: enderecoData.localidade,
+            estado: enderecoData.uf,
+            avatar: avatarUrl,
+            operador: operadorAtual
+        };
+
+        clientes.push(novoCliente);
+        salvarClientes();
+        renderizarCards();
+
+        statusEl.className = "status sucesso";
+        statusEl.textContent = "Cadastro concluído com sucesso!";
+        form.reset();
+
+
+
+    } catch (error) {
+
+        statusEl.className = "status erro";
+        statusEl.textContent = "Cadastro negado - " + error.message;
+
+
+    } finally {
+        btnSalvar.textContent = "Processado!";
+        await esperar(timeLimite02);
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = "Salvar";
+        btnSalvar.classList.remove("btn_processando");
+        statusEl.style.display = "none";
+       // statusEl.textContent = "";
+       // statusEl.classList.remove("status");
     }
-
-    const novoCliente = {
-        id: crypto.randomUUID(),
-        nome: nomeInput.value,
-        email: emailInput.value,
-        plano: planoSelect.value,
-        cep: cepInput.value,
-        endereco: ruaInput.value,
-        cidade: cidadeInput.value,
-        estado: estadoInput.value,
-        avatar: gerarAvatar(nomeInput.value),
-        operador: operadorAtual
-    };
-
-    clientes.push(novoCliente);
-    salvarClientes();
-    renderizarCards();
-    form.reset();
 });
 
-/* REMOVER COM ANIMAÇÃO */
+/* REMOVER CLIENTE */
 function removerCliente(id) {
     clientes = clientes.filter(c => c.id !== id);
     salvarClientes();
@@ -179,53 +237,70 @@ emailInput.addEventListener("blur", () => {
 });
 
 /* BUSCAR CEP - ViaCEP API */
-cepInput.addEventListener("blur", async () => {
+async function buscarCEP(cep) {
 
-    const cep = cepInput.value.replace(/\D/g, "");
+    const cepLimpo = cep.replace(/\D/g, "");
 
-    if (cep.length !== 8) {
-        mostrarErroCEP("CEP inválido.");
-        cepValido = false;
-        return;
+    if (cepLimpo.length !== 8) {
+        throw new Error("CEP inválido.");
     }
 
-    try {
+    const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
 
-        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-
-        if (!response.ok) {
-            throw new Error("Erro na requisição.");
-        }
-
-        const data = await response.json();
-
-        if (data.erro) {
-            throw new Error("CEP não encontrado.");
-        }
-
-        ruaInput.value = data.logradouro;
-        bairroInput.value = data.bairro;
-        cidadeInput.value = data.localidade;
-        estadoInput.value = data.uf;
-
-        cepInput.classList.remove("erro");
-        cepValido = true;
-
-    } catch (error) {
-
-        mostrarErroCEP("Não foi possível buscar o CEP.");
-        cepValido = false;
+    if (!response.ok) {
+        throw new Error("Erro ao consultar CEP.");  
     }
-});
 
-function mostrarErroCEP(msg) {
+    const data = await response.json();
+
+    if (data.erro) {
+        throw new Error("CEP não encontrado.");
+    }
+
+    return data;
+}
+
+function mostrarErroCEP() {
     cepInput.classList.add("erro");
+    ruaInput.removeAttribute('readonly');
     ruaInput.value = "";
     bairroInput.value = "";
     cidadeInput.value = "";
     estadoInput.value = "";
 }
+
 /* GERAR AVATAR */
 function gerarAvatar(nome) {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}`;
+   return `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}`;  
+}
+
+/* ANALISE DE CREDITO */
+function simularAnaliseCredito(nome, plano) {
+    return new Promise((resolve, reject) => {
+
+        if (plano === "Silver" || plano === "Bronze") {
+            return resolve(`Cliente ${nome}: Análise de Crédito Aprovada`);
+        }else{
+            setTimeout(() => {
+                if (Math.random() < 0.2) {
+                    reject(new Error(`Cliente ${nome}: Análise de Crédito Reprovada`));
+                } else {
+                    resolve(`Cliente ${nome}: Análise de Crédito Aprovada`);
+                }
+
+            }, timeLimite01);
+        }
+
+    });
+}
+function formatCEP(input) { 
+    let value = input.value.replace(/\D/g, '');
+    
+    if (value.length > 5) {
+        value = value.substring(0, 5) + '-' + value.substring(5, 8);
+    }    
+    input.value = value;
+}
+function esperar(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

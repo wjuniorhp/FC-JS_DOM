@@ -62,6 +62,12 @@ input, select {
     opacity: 0;
     transform: translateY(-10px);
 }
+.btn_processando:disabled{
+    cursor: not-allowed;
+    background: #f4f4f4;
+    color: #333;
+    
+}
 
 @keyframes fadeIn {
     to {
@@ -73,10 +79,6 @@ input, select {
 .gold { border-left: 10px solid gold; }
 .silver { border-left: 10px solid silver; }
 .bronze { border-left: 10px solid #cd7f32; }
-
-.erro {
-    border: 2px solid red !important;
-}
 
 .login-screen {
     height: 100vh;
@@ -99,12 +101,30 @@ input, select {
     margin-bottom: 10px;
 }
 
-.erro {
-    border: 2px solid red !important;
-}
 
 .mensagem {
     margin-top: 10px;
     font-size: 14px;
     color: red;
+}
+.status {
+    margin-top: 10px;
+    font-weight: bold;
+    width: 90%;
+    padding: 10px;
+}
+
+.status.loading {
+    color: #007bff;
+    border: 2px solid #007bff;
+}
+
+.status.erro {
+    color: red;
+    border: 2px solid red;
+}
+
+.status.sucesso {
+    color: green;
+    border: 2px solid green;
 }
